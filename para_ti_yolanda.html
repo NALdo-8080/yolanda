@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08070d">
+  <title>Para ti</title>
+  <style>
+    :root { --ink:#f9eff2; --muted:#c4b2bb; --rose:#ff668b; --wine:#8e294a; --night:#08070d; }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { margin:0; width:100%; height:100%; overflow:hidden; background:var(--night); }
+    body { color:var(--ink); font-family:Georgia, "Times New Roman", serif; }
+    button { font:inherit; color:inherit; border:0; cursor:pointer; }
+    #sky { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; }
+    .vignette { position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,.42) 100%); }
+    main { min-height:100%; display:grid; place-items:center; padding:max(30px, env(safe-area-inset-top)) 22px max(34px, env(safe-area-inset-bottom)); position:relative; }
+    .scene { width:min(100%, 430px); text-align:center; display:none; animation:appear .9s ease both; }
+    .scene.active { display:block; }
+    .eyebrow { color:#f4a0b5; font:600 .69rem/1.4 Arial, sans-serif; letter-spacing:.25em; text-transform:uppercase; margin:0 0 22px; }
+    h1 { margin:0; font-size:clamp(2.3rem, 12vw, 4rem); font-weight:400; line-height:1.06; letter-spacing:-.04em; }
+    .copy { color:var(--muted); font-size:1.05rem; line-height:1.7; margin:23px auto 0; max-width:34ch; }
+    .tap { margin-top:44px; padding:15px 24px; min-width:190px; border-radius:99px; background:linear-gradient(135deg, #b93861, #ff7799); box-shadow:0 12px 35px rgba(233,71,116,.23); font:600 .78rem/1 Arial,sans-serif; letter-spacing:.13em; text-transform:uppercase; transition:transform .2s, box-shadow .2s; }
+    .tap:active { transform:scale(.96); box-shadow:0 5px 17px rgba(233,71,116,.2); }
+    .hint { display:block; color:#a08d96; font:italic .85rem/1.4 Georgia,serif; margin-top:18px; }
+    .heart-wrap { width:150px; height:142px; margin:0 auto 35px; display:grid; place-items:center; }
+    .heart { width:88px; height:88px; position:relative; transform:rotate(-45deg); background:linear-gradient(135deg,#ff8ba9,#bb3159 70%); border-radius:8px 0 8px 0; box-shadow:0 0 42px rgba(255,83,127,.65); animation:beat 1.2s ease-in-out infinite; }
+    .heart:before,.heart:after { content:""; position:absolute; width:88px; height:88px; border-radius:50%; background:inherit; }
+    .heart:before { top:-44px; left:0; } .heart:after { left:44px; top:0; }
+    .heart-glow { position:absolute; width:150px; height:150px; border:1px solid rgba(255,153,180,.22); border-radius:50%; animation:ripple 2.5s ease-out infinite; }
+    .heart-wrap::after { content:""; position:absolute; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(194,43,86,.17), transparent 65%); }
+    #scene-story .line { opacity:0; transform:translateY(10px); margin:0 0 15px; font-size:clamp(1.45rem, 7vw, 2.1rem); line-height:1.25; }
+    #scene-story .line.show { animation:line-in .8s ease forwards; }
+    .final-card { padding:31px 24px 28px; border:1px solid rgba(255,210,222,.16); border-radius:22px; background:linear-gradient(145deg, rgba(255,255,255,.10), rgba(155,30,70,.13)); box-shadow:0 24px 65px rgba(0,0,0,.31); backdrop-filter:blur(5px); }
+    .final-card h1 { font-size:clamp(2.55rem, 13vw, 4.1rem); color:#fff5f7; }
+    .signature { margin:31px 0 0; color:#f4a0b5; font:italic 1.15rem/1.5 Georgia,serif; }
+    .restart { margin-top:27px; color:#d9bbc5; background:transparent; font:600 .68rem/1 Arial,sans-serif; letter-spacing:.14em; text-transform:uppercase; text-decoration:underline; text-underline-offset:5px; }
+    .personalize { position:fixed; right:14px; bottom:max(12px, env(safe-area-inset-bottom)); color:rgba(224,202,211,.32); font:10px/1 Arial,sans-serif; letter-spacing:.04em; }
+    @keyframes appear { from{opacity:0; transform:translateY(8px)} to{opacity:1;transform:none} }
+    @keyframes line-in { to{opacity:1;transform:none} }
+    @keyframes beat { 0%,100%{transform:rotate(-45deg) scale(1)} 13%{transform:rotate(-45deg) scale(1.12)} 25%{transform:rotate(-45deg) scale(1)} 38%{transform:rotate(-45deg) scale(1.08)} 54%{transform:rotate(-45deg) scale(1)} }
+    @keyframes ripple { from{transform:scale(.52);opacity:.8} to{transform:scale(1.25);opacity:0} }
+    @media (prefers-reduced-motion:reduce) { *,*:before,*:after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+  </style>
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas><div class="vignette"></div>
+  <main>
+    <section class="scene active" id="scene-start">
+      <p class="eyebrow">Una pequeña sorpresa</p>
+      <h1>Para ti,<br><span id="nameStart">[SU NOMBRE]</span></h1>
+      <p class="copy">Hice este pequeño rincón para que lo abras cuando quieras sentirme un poquito más cerca.</p>
+      <button class="tap" id="begin" type="button">Toca para comenzar</button>
+      <span class="hint">Funciona incluso sin internet</span>
+    </section>
+
+    <section class="scene" id="scene-heart">
+      <div class="heart-wrap"><i class="heart-glow"></i><div class="heart"></div></div>
+      <p class="eyebrow">Late por ti</p>
+      <h1>Hay algo<br>que quiero decirte…</h1>
+      <p class="copy">No tienes que hacer nada. Solo quédate aquí un momento.</p>
+    </section>
+
+    <section class="scene" id="scene-story" aria-live="polite">
+      <p class="line">Aunque haya distancia…</p>
+      <p class="line">hay cosas que no cambian.</p>
+      <p class="line">Mi forma de pensarte.</p>
+      <p class="line">Mis ganas de coincidir contigo.</p>
+      <p class="line">Y esto:</p>
+    </section>
+
+    <section class="scene" id="scene-final">
+      <div class="final-card">
+        <p class="eyebrow">Siempre contigo</p>
+        <h1>Te quiero<br><span id="nameFinal">[SU NOMBRE]</span> ♥</h1>
+        <p class="copy" id="finalPhrase">[ESCRIBE AQUÍ SU FRASE ESPECIAL. Por ejemplo: “No importa cuántos kilómetros haya entre nosotros; siempre hay una parte de mí contigo.”]</p>
+        <p class="signature">Con cariño,<br><span id="signature">[TU NOMBRE]</span></p>
+      </div>
+      <button class="restart" id="restart" type="button">Volver a verlo</button>
+    </section>
+  </main>
+  <span class="personalize">Puedes personalizar los textos dentro de este archivo.</span>
+  <script>
+    /* PERSONALIZA SOLO ESTAS TRES LÍNEAS. Deja las comillas. */
+    const PERSONA = "Yolanda";
+    const FIRMA = "Ronaldo";
+    const FRASE_FINAL = "Eres esa clase de persona que hace que todo se sienta más fácil solo con estar cerca. Gracias por ser exactamente quien eres, mi obrera favorita.";
+
+    document.querySelectorAll('#nameStart, #nameFinal').forEach(el => el.textContent = PERSONA);
+    document.querySelector('#signature').textContent = FIRMA;
+    document.querySelector('#finalPhrase').textContent = FRASE_FINAL;
+
+    const scenes = [...document.querySelectorAll('.scene')];
+    const show = id => { scenes.forEach(s => s.classList.toggle('active', s.id === id)); };
+    const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    async function start() {
+      show('scene-heart');
+      await pause(3300);
+      show('scene-story');
+      for (const line of document.querySelectorAll('#scene-story .line')) {
+        line.classList.add('show'); await pause(1450);
+      }
+      await pause(1100); show('scene-final'); burst(44);
+    }
+    document.querySelector('#begin').addEventListener('click', start, {once:true});
+    document.querySelector('#restart').addEventListener('click', () => location.reload());
+    document.addEventListener('pointerdown', e => { if (document.querySelector('#scene-final').classList.contains('active')) burst(9, e.clientX, e.clientY); });
+
+    const canvas = document.querySelector('#sky'), ctx = canvas.getContext('2d');
+    let dots = [], sparks = [], w, h, dpr;
+    function size() { dpr = Math.min(devicePixelRatio || 1, 2); w = innerWidth; h = innerHeight; canvas.width=w*dpr; canvas.height=h*dpr; canvas.style.width=w+'px'; canvas.style.height=h+'px'; ctx.setTransform(dpr,0,0,dpr,0,0); }
+    function makeDot() { return {x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.6+.25,a:Math.random()*.45+.1,v:Math.random()*.18+.04}; }
+    function burst(count, x=w/2, y=h*.52) { for(let i=0;i<count;i++){ const a=Math.random()*Math.PI*2, s=Math.random()*2.7+.5; sparks.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-1,r:Math.random()*2+.7,a:1,life:Math.random()*40+45}); } }
+    function draw(){ ctx.clearRect(0,0,w,h); dots.forEach(p=>{p.y-=p.v; if(p.y<-4)Object.assign(p,makeDot(),{y:h+4}); ctx.fillStyle=`rgba(255,196,213,${p.a})`;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill();}); sparks=sparks.filter(p=>p.life-- >0); sparks.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.025;p.a=p.life/85;ctx.fillStyle=`rgba(255,121,156,${p.a})`;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill();}); requestAnimationFrame(draw); }
+    addEventListener('resize', () => { size(); dots=Array.from({length:Math.ceil(w*h/9000)},makeDot); }); size(); dots=Array.from({length:Math.ceil(w*h/9000)},makeDot); draw();
+  </script>
+</body>
+</html>
